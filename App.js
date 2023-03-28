@@ -10,7 +10,7 @@ import firebaseConfig from './utils/utils';
 const Stack = createNativeStackNavigator();
 
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, disableNetwork, enableNetwork } from "firebase/firestore";
 
 // import the screens
 import ShoppingLists from './components/ShoppingLists';
@@ -19,7 +19,7 @@ import Welcome from './components/Welcome';
 LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
 
 const App = () => {
-  
+
   const connectionStatus = useNetInfo();
 
   // Initialize Firebase
@@ -32,6 +32,10 @@ const App = () => {
   useEffect(()=>{
     if(connectionStatus.isConnected === false){
       Alert.alert("App is no longer connected to internet.")
+      disableNetwork(db);
+    }
+    else{
+      enableNetwork(db);
     }
   }, [connectionStatus.isConnected])
 
@@ -44,7 +48,7 @@ const App = () => {
         <Stack.Screen
           name="ShoppingLists"
         >
-          {props => <ShoppingLists db={db} {...props} />}
+          {props => <ShoppingLists db={db} isConnected={connectionStatus.isConnected} {...props} />}
         </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
